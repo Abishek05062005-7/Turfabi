@@ -1,24 +1,56 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuthStore } from '../store/authStore';
+import { useNavigate , Link } from 'react-router-dom';
+//import { useAuthStore } from '../store/authStore';
+import {auth} from '../store/firebase'
+
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 
 const SignUp: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
-  const login = useAuthStore((state) => state.login);
+  //const login = useAuthStore((state) => state.login);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Mock signup - in real app, this would make an API call
-    login({
-      id: Date.now().toString(),
-      email,
-      name,
-      role: 'user',
-    });
-    navigate('/');
+    // login({
+    //   id: Date.now().toString(),
+    //   email,
+    //   name,
+    //   role: 'user',
+    // });
+    // navigate('/');
+
+
+    // try{
+    //    createUserWithEmailAndPassword(auth,email,password);
+    //   console.log("Account  created successfully");
+    // }catch(err){
+    //   console.log(err);
+    // }
+
+
+    createUserWithEmailAndPassword(auth,email, password)
+    .then((userCredential) => {
+      // User successfully created
+      var user = userCredential.user;
+      console.log("User registered: ", user);
+    })
+    .catch((error) => {
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      if (errorCode === 'auth/email-already-in-use') {
+        console.log("This email is already in use. Please try logging in.");
+        // Optionally, offer to reset password or suggest login page
+      } else {
+        console.error("Error registering user: ", errorMessage);
+      }
+        });
+  
+     navigate('/');
+
   };
 
   return (

@@ -19,6 +19,14 @@ const Home: React.FC = () => {
       image: 'https://images.unsplash.com/photo-1529900748604-07564a03e7a6?auto=format&fit=crop&q=80&w=800',
       available: true,
     },
+    {
+      id: '3',
+      name: 'society Field',
+      description: 'casual games and practice sessions',
+      pricePerHour: 600,
+      image: 'https://images.unsplash.com/photo-1529900748604-07564a03e7a6?auto=format&fit=crop&q=80&w=800',
+      available: true,
+    },
   ];
 
   return (
@@ -60,7 +68,7 @@ const Home: React.FC = () => {
                 </div>
               </div>
               <button className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors">
-                Book Now
+                chat & book it
               </button>
             </div>
           </div>

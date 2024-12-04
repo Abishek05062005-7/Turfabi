@@ -5,10 +5,28 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
 import Dashboard from './pages/admin/Dashboard';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+//import Navbar from './components/Navbar.tsx';
+
+
 
 function App() {
   return (
     <BrowserRouter>
+
+      <ToastContainer 
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored" // Optional: Choose a theme
+      />
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />

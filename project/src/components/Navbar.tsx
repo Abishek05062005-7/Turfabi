@@ -1,15 +1,47 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../store/authStore';
+import { useAuth } from '../hooks/useAuth';
 import { LogOut, User, UserPlus } from 'lucide-react';
+import { toast } from 'react-toastify'; // Importing react-toastify
+import 'react-toastify/dist/ReactToastify.css'; // Import the CSS for react-toastify
+import { doc, getDoc } from 'firebase/firestore'; // Firestore functions
+import { db } from '../store/firebase'; // Firebase Firestore instance
 
 const Navbar: React.FC = () => {
-  const { user, logout } = useAuthStore();
+  const { user, logout } = useAuth();
+  const [userName, setUserName] = useState<string | null>(null); // State to store the user name
   const navigate = useNavigate();
+
+  // Fetch user name from Firestore
+  useEffect(() => {
+    const fetchUserName = async () => {
+      if (user && user.uid) {
+        try {
+          const docRef = doc(db, 'users', user.uid); // Assume 'users' collection with user.uid as document ID
+          const docSnap = await getDoc(docRef);
+
+          if (docSnap.exists()) {
+            const name = docSnap.data().name;
+            setUserName(name);
+          } else {
+            console.log('No such user document in Firestore!');
+          }
+        } catch (error) {
+          console.error('Error fetching user name:', error);
+        }
+      }
+    };
+
+    fetchUserName();
+  }, [user]);
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    toast.success('You have successfully logged out!', {
+      position: 'top-right',
+      autoClose: 3000,
+    });
+    navigate('/');
   };
 
   return (
@@ -17,13 +49,15 @@ const Navbar: React.FC = () => {
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="text-xl font-bold text-gray-800">
-            TurfBook
+            PlayTurf
           </Link>
-          
+
           <div className="flex items-center space-x-4">
             {user ? (
               <>
-                <span className="text-gray-600">Welcome, {user.name}</span>
+                <span className="text-gray-600">
+                  Welcome, {userName || 'User'}
+                </span>
                 {user.role === 'admin' && (
                   <Link to="/admin" className="text-blue-600 hover:text-blue-700">
                     Admin Dashboard

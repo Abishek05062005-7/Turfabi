@@ -1,33 +1,60 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuthStore } from '../store/authStore';
+import { auth } from '../store/firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { toast } from 'react-toastify'; // Import react-toastify
+import 'react-toastify/dist/ReactToastify.css'; // Import toastify CSS
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
-  const login = useAuthStore((state) => state.login);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock login - in real app, this would make an API call
-    if (email === 'admin@example.com' && password === 'admin') {
-      login({
-        id: '1',
-        email,
-        name: 'Admin User',
-        role: 'admin',
+
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // User successfully logged in
+        const user = userCredential.user;
+        console.log('Login Successful:', user.email);
+
+        // Determine user role (admin or regular user) based on email
+        if (user.email === 'admin@example.com') {
+          toast.success('Welcome Admin! Redirecting to Dashboard...', {
+            position: 'top-right',
+            autoClose: 3000,
+          });
+          navigate('/admin'); // Navigate to Admin Dashboard
+        } else {
+          toast.success('Welcome! Redirecting to Home...', {
+            position: 'top-right',
+            autoClose: 3000,
+          });
+          navigate('/'); // Navigate to User Dashboard or Home
+        }
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+
+        // Handle specific Firebase auth errors
+        if (errorCode === 'auth/user-not-found') {
+          toast.error('No user found with this email. Please sign up.', {
+            position: 'top-right',
+            autoClose: 3000,
+          });
+        } else if (errorCode === 'auth/wrong-password') {
+          toast.error('Incorrect password. Please try again.', {
+            position: 'top-right',
+            autoClose: 3000,
+          });
+        } else {
+          toast.error(`Error: ${error.message}`, {
+            position: 'top-right',
+            autoClose: 3000,
+          });
+        }
       });
-      navigate('/admin');
-    } else if (email === 'user@example.com' && password === 'user') {
-      login({
-        id: '2',
-        email,
-        name: 'Regular User',
-        role: 'user',
-      });
-      navigate('/');
-    }
   };
 
   return (
